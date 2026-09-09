@@ -65,4 +65,3 @@ const questions = [
     { question: "Quel président de la République a dissous l'Assemblée nationale en 1997, entraînant une cohabitation avec Lionel Jospin ?", answers: ["Valéry Giscard d'Estaing", "François Mitterrand", "Jacques Chirac"], correct: 2 },
     { question: "En quelle année l'Euro est-il devenu la monnaie fiduciaire (pièces et billets) en circulation en France ?", answers: ["1999", "2002", "2005"], correct: 1 },
 ];
-
