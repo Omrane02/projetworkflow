@@ -4,10 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GamePage</title>
-            <h1>Rappelle toi</h1>
 </head>
 <body>
     <header>
+        <h1>Rappelle toi</h1>
     </header>
+
+    <main>
+        <div id="quiz-container">
+            <div id="quizz-header">
+                <span id="question-counter"></span>
+                <span id="score-display"></span>
+            </div>
+
+            <h2 id="question-text"></h2>
+
+            <div id="answers-container"></div>
+
+            <button id="next-btn" style="display:none;">Question suivante</button>
+        </div>
+
+        <div id="result-container" style="display:none;"></div>
+    </main>
+
+<script src="./backendGamePage/backend.js"></script>
+<script src="./backendGamePage/game.js"></script>
 </body>
 </html>
