@@ -52,9 +52,23 @@
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
+            text-align: center;
         }
         .btn:hover { background: #1d4ed8; }
         .btn:disabled { background: #475569; cursor: not-allowed; }
+        .btn-survival {
+            background: #dc2626;
+        }
+        .btn-survival:hover { background: #b91c1c; }
+        .button-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .button-row .btn {
+            flex: 1;
+            min-width: 140px;
+        }
         ol { padding-left: 1.4rem; margin: 0; }
         ol li { padding: .35rem 0; }
         .leaderboard-empty { list-style: none; color: #94a3b8; font-style: italic; }
@@ -72,7 +86,10 @@
         <label for="username">Entre ton pseudo :</label>
         <input type="text" id="username" name="username" placeholder="Ton pseudo" maxlength="20" autocomplete="off">
         <p class="error" id="error"></p>
-        <a href="#" class="btn" id="play-btn">Jouer</a>
+        <div class="button-row">
+            <a href="#" class="btn" id="play-btn">Jouer</a>
+            <a href="#" class="btn btn-survival" id="survival-btn">Mode survie</a>
+        </div>
     </div>
 
     <div class="card">
@@ -90,6 +107,7 @@
         const usernameInput = document.getElementById("username");
         const errorEl = document.getElementById("error");
         const playBtn = document.getElementById("play-btn");
+        const survivalBtn = document.getElementById("survival-btn");
         const listEl = document.getElementById("leaderboard-list");
 
         function getLeaderboard() {
@@ -134,8 +152,7 @@
 
         usernameInput.value = localStorage.getItem(PSEUDO_KEY) || "";
 
-        playBtn.addEventListener("click", (e) => {
-            e.preventDefault();
+        function startGame(mode = "classic") {
             const pseudo = usernameInput.value.trim();
             if (!pseudo) {
                 errorEl.textContent = "Merci d'entrer un pseudo avant de jouer.";
@@ -144,7 +161,18 @@
             }
             errorEl.textContent = "";
             localStorage.setItem(PSEUDO_KEY, pseudo);
-            window.location.href = GAME_PAGE_URL;
+            const targetUrl = mode === "survie" ? `${GAME_PAGE_URL}?mode=survie` : GAME_PAGE_URL;
+            window.location.href = targetUrl;
+        }
+
+        playBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            startGame("classic");
+        });
+
+        survivalBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            startGame("survie");
         });
 
         usernameInput.addEventListener("input", () => {

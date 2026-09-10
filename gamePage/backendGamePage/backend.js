@@ -1,5 +1,5 @@
-// Niveau 1 : Facile
-const easyQuestions = [
+const questions = [
+    // Niveau 1 : Facile
     { question: "Quel chef gaulois a affronté Jules César à Alésia ?", answers: ["Astérix", "Vercingétorix", "Attila"], correct: 1 },
     { question: "Quel roi des Francs s'est fait baptiser à Reims vers 496 ?", answers: ["Clovis", "Dagobert", "Charlemagne"], correct: 0 },
     { question: "Quel empereur a été couronné le jour de Noël en l'an 800 ?", answers: ["Saint Louis", "Charlemagne", "François Ier"], correct: 1 },
@@ -20,10 +20,8 @@ const easyQuestions = [
     { question: "En quelle année les femmes ont-elles obtenu le droit de vote en France ?", answers: ["1936", "1944", "1968"], correct: 1 },
     { question: "Quelle République est la forme actuelle du gouvernement français (instaurée en 1958) ?", answers: ["La IIIe République", "La IVe République", "La Ve République"], correct: 2 },
     { question: "Quel événement social et étudiant majeur a secoué la France au printemps 1968 ?", answers: ["Le Front populaire", "Mai 68", "La Commune de Paris"], correct: 1 },
-];
 
-// Niveau 2 : Moyen
-const mediumQuestions = [
+    // Niveau 2 : Moyen
     { question: "Quelle bataille navale de 1340 marque le début de la guerre de Cent Ans ?", answers: ["La bataille de l'Écluse", "La bataille de Crécy", "La bataille d'Azincourt"], correct: 0 },
     { question: "Quel roi de France a été fait prisonnier lors de la bataille de Pavia en 1525 ?", answers: ["Charles VIII", "François Ier", "Henri II"], correct: 1 },
     { question: "Quel massacre de protestants s'est déroulé à Paris la nuit du 24 août 1572 ?", answers: ["La Saint-Barthélemy", "La nuit des Barricades", "La conspiration d'Amboise"], correct: 0 },
@@ -44,10 +42,8 @@ const mediumQuestions = [
     { question: "Quelle coalition de gauche a remporté les élections législatives françaises en 1936 ?", answers: ["Le Cartel des gauches", "Le Front populaire", "L'Union sacrée"], correct: 1 },
     { question: "Quel préfet a unifié la Résistance française en créant le Conseil national de la Résistance (CNR) ?", answers: ["Jean Moulin", "Pierre Brossolette", "Emmanuel d'Astier de La Vigerie"], correct: 0 },
     { question: "Quel traité signé en 1957 a fondé la Communauté économique européenne (CEE) avec la France ?", answers: ["Le traité de Paris", "Le traité de Rome", "Le traité de Maastricht"], correct: 1 },
-];
 
-// Niveau 3 : Difficile
-const hardQuestions = [
+    // Niveau 3 : Difficile
     { question: "Quel roi carolingien, dit « le Simple », a cédé la Normandie au chef viking Rollon au traité de Saint-Clair-sur-Epte en 911 ?", answers: ["Charles III", "Charles le Chauve", "Louis IV"], correct: 0 },
     { question: "Quel souverain a remporté la bataille de Bouvines en 1214 contre une coalition européenne ?", answers: ["Philippe Auguste", "Louis VII", "Philippe le Bel"], correct: 0 },
     { question: "Quelle ordonnance signée par François Ier en 1539 a imposé l'usage du français dans les actes officiels ?", answers: ["L'ordonnance de Villers-Cotterêts", "L'ordonnance de Moulins", "L'ordonnance de Blois"], correct: 0 },
@@ -69,8 +65,3 @@ const hardQuestions = [
     { question: "Quel président de la République a dissous l'Assemblée nationale en 1997, entraînant une cohabitation avec Lionel Jospin ?", answers: ["Valéry Giscard d'Estaing", "François Mitterrand", "Jacques Chirac"], correct: 2 },
     { question: "En quelle année l'Euro est-il devenu la monnaie fiduciaire (pièces et billets) en circulation en France ?", answers: ["1999", "2002", "2005"], correct: 1 },
 ];
-
-// Export si utilisé comme module (Node/ES modules)
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = { easyQuestions, mediumQuestions, hardQuestions };
-}

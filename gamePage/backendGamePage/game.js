@@ -1,17 +1,36 @@
 // game.js
-// Nécessite que questions.js soit chargé avant
-// (il définit "easyQuestions", "mediumQuestions", "hardQuestions")
+// Nécessite que backend.js soit chargé avant (il définit "questions")
 
 let currentQuestionIndex = 0;
 let score = 0;
+let lives = 3;
 let shuffledQuestions = [];
-let currentLevel = null;
+let currentMode = "classic";
+let gameEnded = false;
 
-const LEVELS = {
-    easy: { label: "Facile", data: () => easyQuestions },
-    medium: { label: "Moyen", data: () => mediumQuestions },
-    hard: { label: "Difficile", data: () => hardQuestions },
-};
+function getModeFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("mode") === "survie" ? "survie" : "classic";
+}
+
+function updateGameStatus() {
+    const scoreDisplay = document.getElementById('score-display');
+    const livesDisplay = document.getElementById('lives-display');
+    const questionCounter = document.getElementById('question-counter');
+
+    scoreDisplay.textContent = `Score : ${score}`;
+
+    if (currentMode === 'survie') {
+        livesDisplay.textContent = `Vies : ${'❤️ '.repeat(lives).trim() || '0'}`;
+        livesDisplay.classList.remove('hidden');
+    } else {
+        livesDisplay.classList.add('hidden');
+    }
+
+    if (questionCounter) {
+        questionCounter.textContent = `Question ${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
+    }
+}
 
 function shuffleArray(array) {
     const arr = [...array];
@@ -22,65 +41,31 @@ function shuffleArray(array) {
     return arr;
 }
 
-function ensureLevelSelectContainer() {
-    let container = document.getElementById('level-select-container');
-    if (container) return container;
-
-    container = document.createElement('div');
-    container.id = 'level-select-container';
-
-    const title = document.createElement('h2');
-    title.textContent = "Choisis un niveau";
-    container.appendChild(title);
-
-    const btnWrapper = document.createElement('div');
-    btnWrapper.id = 'level-buttons';
-
-    Object.entries(LEVELS).forEach(([key, { label }]) => {
-        const btn = document.createElement('button');
-        btn.textContent = label;
-        btn.classList.add('level-btn');
-        btn.dataset.level = key;
-        btn.addEventListener('click', () => startGame(key));
-        btnWrapper.appendChild(btn);
-    });
-
-    container.appendChild(btnWrapper);
-
-    // Insère avant le quiz-container si possible, sinon à la fin du body
-    const quizContainer = document.getElementById('quiz-container');
-    if (quizContainer && quizContainer.parentNode) {
-        quizContainer.parentNode.insertBefore(container, quizContainer);
-    } else {
-        document.body.appendChild(container);
-    }
-
-    return container;
-}
-
-function showLevelSelect() {
-    const levelContainer = ensureLevelSelectContainer();
-    levelContainer.style.display = 'block';
-    document.getElementById('quiz-container').style.display = 'none';
-    document.getElementById('result-container').style.display = 'none';
-}
-
-function startGame(level) {
-    if (!LEVELS[level]) return;
-
-    currentLevel = level;
-    shuffledQuestions = shuffleArray(LEVELS[level].data());
+function initGame() {
+    currentMode = getModeFromUrl();
+    shuffledQuestions = shuffleArray(questions);
     currentQuestionIndex = 0;
     score = 0;
+    lives = 3;
+    gameEnded = false;
 
-    document.getElementById('level-select-container').style.display = 'none';
     document.getElementById('quiz-container').style.display = 'block';
     document.getElementById('result-container').style.display = 'none';
 
+    updateGameStatus();
     showQuestion();
 }
 
 function showQuestion() {
+    if (gameEnded) {
+        return;
+    }
+
+    if (currentMode === 'survie' && lives <= 0) {
+        showFinalResult();
+        return;
+    }
+
     if (currentQuestionIndex >= shuffledQuestions.length) {
         showFinalResult();
         return;
@@ -88,9 +73,7 @@ function showQuestion() {
 
     const q = shuffledQuestions[currentQuestionIndex];
 
-    document.getElementById('question-counter').textContent =
-        `Question ${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
-    document.getElementById('score-display').textContent = `Score : ${score}`;
+    updateGameStatus();
     document.getElementById('question-text').textContent = q.question;
 
     const answersContainer = document.getElementById('answers-container');
@@ -108,6 +91,10 @@ function showQuestion() {
 }
 
 function selectAnswer(selectedIndex, btnElement) {
+    if (gameEnded) {
+        return;
+    }
+
     const q = shuffledQuestions[currentQuestionIndex];
     const buttons = document.querySelectorAll('.answer-btn');
 
@@ -122,9 +109,21 @@ function selectAnswer(selectedIndex, btnElement) {
         score++;
     } else {
         btnElement.classList.add('incorrect');
+
+        if (currentMode === 'survie') {
+            lives = Math.max(0, lives - 1);
+            updateGameStatus();
+        }
     }
 
-    document.getElementById('score-display').textContent = `Score : ${score}`;
+    if (currentMode === 'survie' && lives <= 0) {
+        gameEnded = true;
+        document.getElementById('next-btn').style.display = 'none';
+        showFinalResult();
+        return;
+    }
+
+    updateGameStatus();
     document.getElementById('next-btn').style.display = 'inline-block';
 }
 
@@ -134,23 +133,27 @@ function nextQuestion() {
 }
 
 function showFinalResult() {
+    gameEnded = true;
     document.getElementById('quiz-container').style.display = 'none';
 
     const resultContainer = document.getElementById('result-container');
     resultContainer.style.display = 'block';
+
+    const survivalText = currentMode === 'survie'
+        ? (lives <= 0 ? 'Tu as perdu toutes tes vies !' : 'Tu as survécu au challenge !')
+        : 'Quiz terminé !';
+
     resultContainer.innerHTML = `
-        <h2>Quiz terminé !</h2>
-        <p>Niveau : ${LEVELS[currentLevel].label}</p>
+        <h2>${survivalText}</h2>
         <p>Ton score final : ${score} / ${shuffledQuestions.length}</p>
-        <button id="restart-btn">Choisir un autre niveau</button>
-        <button id="replay-btn">Rejouer ce niveau</button>
+        <p>${currentMode === 'survie' ? `Vies restantes : ${lives}` : ''}</p>
+        <button id="restart-btn">Rejouer</button>
     `;
 
-    document.getElementById('restart-btn').addEventListener('click', showLevelSelect);
-    document.getElementById('replay-btn').addEventListener('click', () => startGame(currentLevel));
+    document.getElementById('restart-btn').addEventListener('click', initGame);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('next-btn').addEventListener('click', nextQuestion);
-    showLevelSelect();
+    initGame();
 });
