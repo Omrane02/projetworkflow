@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mémoire de France</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 2rem 1rem;
+            background: #0f172a;
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        img.titre {
+            max-width: 480px;
+            width: 100%;
+            height: auto;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 480px;
+        }
+        h2 { margin-top: 0; }
+        label { display: block; margin-bottom: .5rem; font-weight: 600; }
+        input[type="text"] {
+            width: 100%;
+            padding: .6rem .8rem;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #f1f5f9;
+            font-size: 1rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: .7rem 1.4rem;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn:hover { background: #1d4ed8; }
+        .btn:disabled { background: #475569; cursor: not-allowed; }
+        ol { padding-left: 1.4rem; margin: 0; }
+        ol li { padding: .35rem 0; }
+        .leaderboard-empty { list-style: none; color: #94a3b8; font-style: italic; }
+        .pseudo { color: #38bdf8; font-weight: 600; }
+        .score { float: right; color: #4ade80; font-weight: 600; }
+        .error { color: #f87171; min-height: 1.2em; font-size: .9rem; }
+    </style>
+</head>
+<body>
+    <img class="titre" src="../img/Titre.png" alt="Mémoire de France">
+
+    <p>Si votre score n'est pas à la hauteur, OQTF</p>
+
+    <div class="card">
+        <label for="username">Entre ton pseudo :</label>
+        <input type="text" id="username" name="username" placeholder="Ton pseudo" maxlength="20" autocomplete="off">
+        <p class="error" id="error"></p>
+        <a href="#" class="btn" id="play-btn">Jouer</a>
+    </div>
+
+    <div class="card">
+        <h2>Classement</h2>
+        <ol id="leaderboard-list">
+            <li class="leaderboard-empty">Aucun score pour l'instant</li>
+        </ol>
+    </div>
+
+    <script>
+        const LEADERBOARD_KEY = "leaderboard";
+        const PSEUDO_KEY = "pseudo";
+        const GAME_PAGE_URL = "../../gamePage/gamePage.html";
+
+        const usernameInput = document.getElementById("username");
+        const errorEl = document.getElementById("error");
+        const playBtn = document.getElementById("play-btn");
+        const listEl = document.getElementById("leaderboard-list");
+
+        function getLeaderboard() {
+            try {
+                const raw = localStorage.getItem(LEADERBOARD_KEY);
+                const data = raw ? JSON.parse(raw) : [];
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function renderLeaderboard() {
+            const entries = getLeaderboard()
+                .filter(e => e && typeof e.pseudo === "string")
+                .sort((a, b) => (b.score || 0) - (a.score || 0))
+                .slice(0, 10);
+
+            listEl.innerHTML = "";
+
+            if (entries.length === 0) {
+                const li = document.createElement("li");
+                li.className = "leaderboard-empty";
+                li.textContent = "Aucun score pour l'instant";
+                listEl.appendChild(li);
+                return;
+            }
+
+            entries.forEach(entry => {
+                const li = document.createElement("li");
+                const pseudo = document.createElement("span");
+                pseudo.className = "pseudo";
+                pseudo.textContent = entry.pseudo;
+                const score = document.createElement("span");
+                score.className = "score";
+                score.textContent = (entry.score || 0) + " pts";
+                li.appendChild(pseudo);
+                li.appendChild(score);
+                listEl.appendChild(li);
+            });
+        }
+
+        usernameInput.value = localStorage.getItem(PSEUDO_KEY) || "";
+
+        playBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const pseudo = usernameInput.value.trim();
+            if (!pseudo) {
+                errorEl.textContent = "Merci d'entrer un pseudo avant de jouer.";
+                usernameInput.focus();
+                return;
+            }
+            errorEl.textContent = "";
+            localStorage.setItem(PSEUDO_KEY, pseudo);
+            window.location.href = GAME_PAGE_URL;
+        });
+
+        usernameInput.addEventListener("input", () => {
+            if (usernameInput.value.trim()) errorEl.textContent = "";
+        });
+
+        window.addEventListener("storage", renderLeaderboard);
+
+        renderLeaderboard();
+    </script>
+</body>
+</html>
